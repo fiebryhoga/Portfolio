@@ -1,8 +1,12 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +35,9 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORSMiddleware(h.cfg.CORSAllowedOrigins))
 
+	// Static uploads directory
+	router.Static("/uploads", "./uploads")
+
 	// Health Check
 	router.GET("/health", h.HealthCheck)
 
@@ -46,6 +53,7 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 		v1.GET("/articles", h.GetArticles)
 		v1.GET("/articles/:slug", h.GetArticleBySlug)
 		v1.POST("/articles", h.CreateArticle)
+		v1.DELETE("/articles/:id", h.DeleteArticle)
 		v1.POST("/contact", h.SubmitContact)
 
 		// Auth
@@ -84,6 +92,9 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 			protected.GET("/admin/messages", h.GetContactMessages)
 			protected.PATCH("/admin/messages/:id/read", h.MarkMessageRead)
 			protected.DELETE("/admin/messages/:id", h.DeleteMessage)
+
+			// Admin File Upload (Avatar, Images, Assets)
+			protected.POST("/admin/upload", h.UploadFile)
 		}
 	}
 }
@@ -477,4 +488,63 @@ func (h *Handler) DeleteArticle(c *gin.Context) {
 	}
 	utils.SendSuccess(c, http.StatusOK, "Article deleted successfully", nil)
 }
+
+// UploadFile handles multipart image uploads (profile avatar, project images, etc.)
+func (h *Handler) UploadFile(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		utils.SendBadRequest(c, "No file provided in form-data", err)
+		return
+	}
+
+	// Maximum allowed size: 10MB
+	if file.Size > 10*1024*1024 {
+		utils.SendBadRequest(c, "File size exceeds 10MB limit", nil)
+		return
+	}
+
+	// Validate file extension
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	allowedExts := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+		".webp": true,
+		".gif":  true,
+		".svg":  true,
+	}
+	if !allowedExts[ext] {
+		utils.SendBadRequest(c, "Invalid file format. Allowed formats: .jpg, .jpeg, .png, .webp, .gif, .svg", nil)
+		return
+	}
+
+	uploadDir := "./uploads"
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		utils.SendInternalServerError(c, "Failed to create upload directory", err)
+		return
+	}
+
+	// Generate safe, unique filename
+	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+	dst := filepath.Join(uploadDir, filename)
+
+	if err := c.SaveUploadedFile(file, dst); err != nil {
+		utils.SendInternalServerError(c, "Failed to save uploaded file", err)
+		return
+	}
+
+	// Public URL accessible through backend static route
+	scheme := "http"
+	if c.Request.TLS != nil {
+		scheme = "https"
+	}
+	fileURL := fmt.Sprintf("%s://%s/uploads/%s", scheme, c.Request.Host, filename)
+
+	utils.SendSuccess(c, http.StatusOK, "File uploaded successfully", gin.H{
+		"url":      fileURL,
+		"filename": filename,
+		"size":     file.Size,
+	})
+}
+
 

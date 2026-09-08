@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useDesktop } from "@/context/DesktopContext";
-import { FolderGit2, FileText, Terminal } from "lucide-react";
+import { FolderGit2, FileText, Terminal, BookOpen } from "lucide-react";
 
 export default function DesktopWallpaper() {
   const { openWindow, theme } = useDesktop();
@@ -123,6 +123,33 @@ export default function DesktopWallpaper() {
             }`}
           >
             Projects
+          </span>
+        </button>
+
+        <button
+          onClick={() => openWindow("writing")}
+          className={`group flex flex-col items-center gap-1 p-2 rounded-xl transition-colors cursor-pointer w-20 text-center ${
+            isDark ? "hover:bg-white/10" : "hover:bg-black/5"
+          }`}
+        >
+          <div
+            className={`w-11 h-11 rounded-xl shadow-md flex items-center justify-center border group-hover:scale-105 transition-transform ${
+              isDark
+                ? "bg-gradient-to-b from-zinc-700 to-zinc-800 border-white/20"
+                : "bg-gradient-to-b from-white to-zinc-200 border-black/10"
+            }`}
+          >
+            <BookOpen
+              size={20}
+              className={isDark ? "text-zinc-200" : "text-zinc-800"}
+            />
+          </div>
+          <span
+            className={`text-[11px] font-medium tracking-tight truncate max-w-[76px] ${
+              isDark ? "text-zinc-300" : "text-zinc-800"
+            }`}
+          >
+            Writing
           </span>
         </button>
 

@@ -65,9 +65,25 @@ export interface ContactMessage {
   created_at: string;
 }
 
+export interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  reading_time: string;
+  published_at: string;
+  is_published: boolean;
+  order_index?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface APIResponse<T> {
   success: boolean;
   message?: string;
   data: T;
   error?: string;
 }
+

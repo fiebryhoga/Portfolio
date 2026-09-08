@@ -1,7 +1,7 @@
 "use client";
 
 import { useDesktop, STAGE_APPS } from "@/context/DesktopContext";
-import { FolderGit2, Terminal, FileText, Settings, User } from "lucide-react";
+import { FolderGit2, Terminal, FileText, Settings, User, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Dock() {
@@ -18,6 +18,8 @@ export default function Dock() {
         return <FileText size={18} />;
       case "skills":
         return <Settings size={18} />;
+      case "writing":
+        return <BookOpen size={18} />;
       case "contact":
         return <Terminal size={18} />;
       default:

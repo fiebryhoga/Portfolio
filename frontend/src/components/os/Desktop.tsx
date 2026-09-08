@@ -15,18 +15,21 @@ import { Hero } from "@/components/Hero";
 import { Projects } from "@/components/Projects";
 import { Experience } from "@/components/Experience";
 import { Skills } from "@/components/Skills";
+import { Articles } from "@/components/Articles";
 import { Contact } from "@/components/Contact";
+import AdminPortal from "@/components/AdminPortal";
 
-import { Profile, Project, Skill, Experience as ExperienceType } from "@/types";
+import { Profile, Project, Skill, Experience as ExperienceType, Article } from "@/types";
 
 type DesktopProps = {
   profile: Profile;
   projects: Project[];
   skills: Skill[];
   experiences: ExperienceType[];
+  articles: Article[];
 };
 
-export default function Desktop({ profile, projects, skills, experiences }: DesktopProps) {
+export default function Desktop({ profile, projects, skills, experiences, articles }: DesktopProps) {
   const { openAppIds, activeAppId, stageManagerOpen, theme } = useDesktop();
 
   const activeApp =
@@ -84,6 +87,12 @@ export default function Desktop({ profile, projects, skills, experiences }: Desk
               </WindowFrame>
             )}
 
+            {activeApp && activeApp.id === "writing" && (
+              <WindowFrame key="writing" id="writing" title="Writing & Notes — Dimas Fiebry">
+                <Articles articles={articles} />
+              </WindowFrame>
+            )}
+
             {activeApp && activeApp.id === "contact" && (
               <WindowFrame key="contact" id="contact" title="Contact & Terminal — Dimas Fiebry">
                 <Contact profile={profile} />
@@ -98,6 +107,9 @@ export default function Desktop({ profile, projects, skills, experiences }: Desk
 
       {/* macOS Spotlight Search Modal */}
       <SpotlightSearch />
+
+      {/* macOS Admin Portal & Content Manager */}
+      <AdminPortal />
     </div>
   );
 }

@@ -121,7 +121,7 @@ func SeedData(db *gorm.DB, cfg *config.Config) {
 			Name:             "Dimas Fiebry Prayhoga Putra",
 			Headline:         "Versatile Fullstack Developer & Performance Systems Engineer",
 			Bio:              "Versatile Fullstack Developer with a strong track record of architecting and deploying scalable web applications, ranging from enterprise-level sports analytics platforms to comprehensive business management solutions. Combining a solid academic foundation from Universitas Brawijaya with extensive hands-on experience in API integrations, database architecture, and end-to-end project management.",
-			AvatarURL:        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+			AvatarURL:        "http://localhost:8080/uploads/1788842474245918000.jpg",
 			ResumeURL:        "https://fiebryhoga.my.id/",
 			GithubURL:        "https://github.com/fiebryhoga",
 			LinkedinURL:      "https://linkedin.com/in/dimas-fiebry-prayhoga-putra/",

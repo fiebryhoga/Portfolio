@@ -9,6 +9,7 @@ import {
   FileText,
   Settings,
   Terminal as TerminalIcon,
+  BookOpen,
   Sparkles,
   Layers,
   X,
@@ -38,6 +39,8 @@ export default function StageManagerRail() {
         return <FileText className={className} />;
       case "skills":
         return <Settings className={className} />;
+      case "writing":
+        return <BookOpen className={className} />;
       case "contact":
         return <TerminalIcon className={className} />;
       default:

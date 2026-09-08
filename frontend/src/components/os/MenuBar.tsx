@@ -23,6 +23,7 @@ export default function MenuBar() {
     toggleTheme,
     setTheme,
     setSpotlightOpen,
+    setAdminPortalOpen,
   } = useDesktop();
 
   useEffect(() => {
@@ -154,6 +155,16 @@ export default function MenuBar() {
                   className={menuItemClass}
                 >
                   <span>System Preferences / Tech Stack</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setAdminPortalOpen(true);
+                    closeMenus();
+                  }}
+                  className={menuItemClass}
+                >
+                  <span className="font-semibold">Admin Portal & Content Manager...</span>
+                  <span className="opacity-60 font-mono text-[10px]">⌘⇧A</span>
                 </button>
                 <div className={separatorClass} />
                 <a

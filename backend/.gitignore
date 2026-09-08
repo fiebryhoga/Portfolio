@@ -1,0 +1,23 @@
+# Environment Variables
+.env
+.env.*
+*.env
+!*.env.example
+
+# Local Database
+*.db
+*.db-journal
+*.sqlite
+portfolio.db
+
+# User Uploaded Media
+uploads/*
+!uploads/.gitkeep
+
+# Go Binaries & Tests
+main
+bin/
+*.exe
+*.test
+*.out
+.DS_Store

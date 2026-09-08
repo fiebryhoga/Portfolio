@@ -10,6 +10,7 @@ import {
   FileText,
   Settings,
   User,
+  BookOpen,
   FileDown,
   Sun,
   Moon,
@@ -32,6 +33,7 @@ export default function SpotlightSearch() {
     spotlightOpen,
     setSpotlightOpen,
     openWindow,
+    setAdminPortalOpen,
     theme,
     toggleTheme,
   } = useDesktop();
@@ -85,12 +87,31 @@ export default function SpotlightSearch() {
       action: () => openWindow("skills"),
     },
     {
+      id: "app-writing",
+      title: "Writing & Notes",
+      subtitle: "Technical Articles, ISMS Case Studies, and Engineering Notes",
+      category: "Applications",
+      icon: <BookOpen className="w-4 h-4" />,
+      action: () => openWindow("writing"),
+    },
+    {
       id: "app-contact",
       title: "Terminal & Contact",
       subtitle: "Interactive Bash Console & Direct Messaging",
       category: "Applications",
       icon: <Terminal className="w-4 h-4" />,
       action: () => openWindow("contact"),
+    },
+    {
+      id: "app-admin",
+      title: "Admin Portal & Content Manager",
+      subtitle: "Manage Profile, Projects, Skills, Articles, Experience & Messages",
+      category: "Applications",
+      icon: <Settings className="w-4 h-4" />,
+      action: () => {
+        setAdminPortalOpen(true);
+        setSpotlightOpen(false);
+      },
     },
 
     // Projects
@@ -192,6 +213,17 @@ export default function SpotlightSearch() {
       category: "Quick Actions",
       icon: <ArrowRight className="w-4 h-4" />,
       action: () => openWindow("contact"),
+    },
+    {
+      id: "act-admin",
+      title: "Open Admin Portal (Cmd+Shift+A)",
+      subtitle: "Authenticated CMS to add, edit, or delete any website content",
+      category: "Quick Actions",
+      icon: <Settings className="w-4 h-4" />,
+      action: () => {
+        setAdminPortalOpen(true);
+        setSpotlightOpen(false);
+      },
     },
   ], [isDark, openWindow, toggleTheme]);
 

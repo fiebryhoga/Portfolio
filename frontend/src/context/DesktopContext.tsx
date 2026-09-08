@@ -15,6 +15,7 @@ export const STAGE_APPS: AppMeta[] = [
   { id: "projects", title: "Projects", subtitle: "Featured Works", badgeColor: "bg-zinc-800", iconName: "FolderGit2" },
   { id: "experience", title: "Experience", subtitle: "Career Journey", badgeColor: "bg-zinc-800", iconName: "FileText" },
   { id: "skills", title: "Skills", subtitle: "Tech Arsenal", badgeColor: "bg-zinc-800", iconName: "Settings" },
+  { id: "writing", title: "Writing", subtitle: "Articles & Notes", badgeColor: "bg-zinc-800", iconName: "BookOpen" },
   { id: "contact", title: "Terminal", subtitle: "bash - 80x24", badgeColor: "bg-zinc-800", iconName: "Terminal" },
 ];
 
@@ -36,6 +37,8 @@ type DesktopContextType = {
   setTheme: (theme: "dark" | "light") => void;
   spotlightOpen: boolean;
   setSpotlightOpen: (val: boolean | ((prev: boolean) => boolean)) => void;
+  adminPortalOpen: boolean;
+  setAdminPortalOpen: (val: boolean | ((prev: boolean) => boolean)) => void;
   windows: { id: string; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean; zIndex: number }[];
 };
 
@@ -45,14 +48,24 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
   // Theme state: dark by default, synced with localStorage and html class
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [spotlightOpen, setSpotlightOpen] = useState<boolean>(false);
+  const [adminPortalOpen, setAdminPortalOpen] = useState<boolean>(false);
 
-  // Global keyboard shortcut for Spotlight Search (Cmd+K / Ctrl+K / Esc)
+  // Global keyboard shortcut for Spotlight Search (Cmd+K) & Admin Portal (Cmd+Shift+A)
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd + Shift + A or Ctrl + Shift + A => Toggle Admin Portal
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setAdminPortalOpen((prev) => !prev);
+        return;
+      }
+      // Cmd + K or Ctrl + K => Toggle Spotlight
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSpotlightOpen((prev) => !prev);
-      } else if (e.key === "Escape") {
+        return;
+      }
+      if (e.key === "Escape") {
         setSpotlightOpen(false);
       }
     };
@@ -194,6 +207,8 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
         setTheme,
         spotlightOpen,
         setSpotlightOpen,
+        adminPortalOpen,
+        setAdminPortalOpen,
         windows,
       }}
     >

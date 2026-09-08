@@ -1,4 +1,4 @@
-import { Profile, Project, Skill, Experience, APIResponse, ContactMessage } from "@/types";
+import { Profile, Project, Skill, Experience, APIResponse, ContactMessage, Article } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
 
@@ -243,6 +243,115 @@ export const fallbackExperiences: Experience[] = [
   },
 ];
 
+export const fallbackArticles: Article[] = [
+  {
+    id: 1,
+    title: "Architecting the Integrated Soccer Monitoring System (ISMS) for Persebaya Surabaya",
+    slug: "architecting-isms-persebaya-surabaya",
+    excerpt: "A technical breakdown of how we engineered a mission-critical athletic load monitoring platform integrating ACWR models, VALD Hub datasets, and neuromuscular readiness scoring.",
+    category: "Sports Analytics",
+    reading_time: "6 min read",
+    published_at: "Sep 5, 2026",
+    is_published: true,
+    order_index: 1,
+    content: `### Introduction & Problem Statement
+
+Professional football teams demand rapid, high-precision analytics to prevent non-contact injuries and maximize athletic output across congested fixture schedules. During my tenure as Fullstack Developer and Assistant Performance Analyst at **PT. Suyoko Fit Sejahtera for Persebaya Surabaya**, we identified a key operational bottleneck: physical performance datasets from disparate hardware ecosystems (GPS trackers, force plates, subjective wellness forms) were fragmented across spreadsheets.
+
+To resolve this, we architected the **Integrated Soccer Monitoring System (ISMS)**: a centralized sports intelligence platform built exclusively for Persebaya Surabaya.
+
+---
+
+### Core Architectural Pillars
+
+1. **Daily Wellness & Subjective RPE Collection**:
+   - Player self-assessment engines recording sleep quality, muscle soreness, stress, and Rating of Perceived Exertion (RPE).
+   - Instant anomaly detection flagging acute dips in wellness before morning training sessions.
+
+2. **Acute:Chronic Workload Ratio (ACWR) Calculation Engine**:
+   - Multi-model workload processing implementing Rolling Average (RA), Exponentially Weighted Moving Average (EWMA), and Weekly Microcycle distributions.
+   - The ratio compares immediate acute workload (7 days) against historical chronic workload (28 days) to pinpoint the "sweet spot" of high fitness with minimal injury risk.
+
+3. **VALD Hub & Force Plate Telemetry Integration**:
+   - Automated ingestion of neuromuscular symmetry scores, eccentric hamstring strength metrics, and countermovement jump (CMJ) force-time curves.
+   - Algorithmic generation of the **Player Performance Readiness Index (PPRI)** to directly guide head coach and medical staff tactical selections.
+
+---
+
+### Key Takeaways
+
+By converging high-volume telemetry into actionable visual dashboards, technical staff were able to tailor microcycle periodization to individual player tolerance thresholds, demonstrating the immense value of software engineering in elite sports performance.`,
+  },
+  {
+    id: 2,
+    title: "Concurrency in Go: Building High-Throughput REST APIs with Gin & Channels",
+    slug: "concurrency-in-go-gin-channels",
+    excerpt: "Practical patterns for leveraging lightweight goroutines, worker pools, and buffered channels to handle concurrent requests without thread starvation.",
+    category: "Backend Engineering",
+    reading_time: "5 min read",
+    published_at: "Sep 2, 2026",
+    is_published: true,
+    order_index: 2,
+    content: `### Why Concurrency Matters in Modern Backend Architecture
+
+In traditional thread-per-request architectures, scaling to thousands of concurrent requests rapidly exhausts server memory. The Go runtime resolves this with **Goroutines**—cooperatively scheduled green threads requiring as little as 2KB of initial stack memory.
+
+When pairing the high-performance **Gin Web Framework** with Go's channel primitives, you can build production microservices capable of processing high-volume workloads with single-digit millisecond latency.
+
+---
+
+### Pattern 1: Non-Blocking Background Tasks with Worker Pools
+
+Instead of spawning unbounded goroutines on every HTTP request, leverage a worker pool with a buffered channel queue to limit concurrency and prevent resource exhaustion.
+
+---
+
+### Pattern 2: Context Cancellation & Timeout Management
+
+Always propagate request contexts with timeouts. This ensures long-running queries or external HTTP calls abort cleanly if a client disconnects.
+
+---
+
+### Conclusion
+
+Embracing Go's concurrency idioms enables clean, resilient backend architectures that scale horizontally with minimal hardware footprint.`,
+  },
+  {
+    id: 3,
+    title: "The Inertia.js Paradigm: Bridging Laravel and React for Modern Fullstack Apps",
+    slug: "inertiajs-laravel-react-fullstack-paradigm",
+    excerpt: "How Inertia.js eliminates the friction of building separate client-side SPAs and REST APIs while keeping the developer velocity of classic monoliths.",
+    category: "Fullstack Architecture",
+    reading_time: "4 min read",
+    published_at: "Aug 31, 2026",
+    is_published: true,
+    order_index: 3,
+    content: `### The Modern Monolith Alternative
+
+Building modern web applications often forces developers to choose between two extremes:
+1. **Server-Side Rendered (SSR) Blade templates**: Rapid productivity, but clunky full-page reloads and limited client-side reactivity.
+2. **Decoupled SPA + REST/GraphQL API**: Smooth client interactions, but duplicate validation logic, manual JWT token handling, and complex state management overhead.
+
+**Inertia.js** offers a third, elegant path: The modern monolith.
+
+---
+
+### How Inertia Works Under the Hood
+
+Inertia is not a framework; it is an architectural adapter. It replaces server-side view engines with client-side component renderers (React, Vue, or Svelte).
+
+- Your routes and controllers remain 100% Laravel.
+- The client receives pure JSON props automatically injected into the React component.
+- Zero client-side routing setup, zero API token synchronization boilerplate.
+
+---
+
+### Summary
+
+For teams that prioritize rapid shipping, type safety, and seamless UX without the complexity of managing two separate codebases, Laravel + Inertia.js + React is an unrivaled fullstack stack.`,
+  },
+];
+
 export async function fetchProfile(): Promise<Profile> {
   try {
     const res = await fetch(`${API_BASE_URL}/profile`, { next: { revalidate: 60 } });
@@ -344,4 +453,336 @@ export async function fetchContactMessages(token: string): Promise<ContactMessag
   const json: APIResponse<ContactMessage[]> = await res.json();
   return json.data || [];
 }
+
+export async function fetchArticles(): Promise<Article[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/articles`, {
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) throw new Error("Backend not available");
+    const json: APIResponse<Article[]> = await res.json();
+    return json.data && json.data.length > 0 ? json.data : fallbackArticles;
+  } catch {
+    return fallbackArticles;
+  }
+}
+
+export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/articles/${slug}`);
+    if (!res.ok) throw new Error("Article not found");
+    const json: APIResponse<Article> = await res.json();
+    return json.data;
+  } catch {
+    return fallbackArticles.find((a) => a.slug === slug) || null;
+  }
+}
+
+export async function createArticle(articleData: Partial<Article>): Promise<Article> {
+  const res = await fetch(`${API_BASE_URL}/articles`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(articleData),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to publish article to backend API");
+  }
+
+  const json: APIResponse<Article> = await res.json();
+  return json.data;
+}
+
+// Authenticated Admin CRUD APIs
+
+export async function updateAdminProfile(
+  token: string,
+  data: Partial<Profile>
+): Promise<Profile> {
+  const res = await fetch(`${API_BASE_URL}/admin/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update profile");
+  }
+  const json: APIResponse<Profile> = await res.json();
+  return json.data;
+}
+
+export async function createAdminProject(
+  token: string,
+  data: Partial<Project>
+): Promise<Project> {
+  const res = await fetch(`${API_BASE_URL}/admin/projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to create project");
+  }
+  const json: APIResponse<Project> = await res.json();
+  return json.data;
+}
+
+export async function updateAdminProject(
+  token: string,
+  id: number,
+  data: Partial<Project>
+): Promise<Project> {
+  const res = await fetch(`${API_BASE_URL}/admin/projects/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update project");
+  }
+  const json: APIResponse<Project> = await res.json();
+  return json.data;
+}
+
+export async function deleteAdminProject(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/admin/projects/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to delete project");
+  }
+}
+
+export async function createAdminSkill(
+  token: string,
+  data: Partial<Skill>
+): Promise<Skill> {
+  const res = await fetch(`${API_BASE_URL}/admin/skills`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to create skill");
+  }
+  const json: APIResponse<Skill> = await res.json();
+  return json.data;
+}
+
+export async function deleteAdminSkill(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/admin/skills/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to delete skill");
+  }
+}
+
+export async function updateAdminSkill(
+  token: string,
+  id: number,
+  data: Partial<Skill>
+): Promise<Skill> {
+  const res = await fetch(`${API_BASE_URL}/admin/skills/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update skill");
+  }
+  const json: APIResponse<Skill> = await res.json();
+  return json.data;
+}
+
+export async function createAdminExperience(
+  token: string,
+  data: Partial<Experience>
+): Promise<Experience> {
+  const res = await fetch(`${API_BASE_URL}/admin/experiences`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to create experience");
+  }
+  const json: APIResponse<Experience> = await res.json();
+  return json.data;
+}
+
+export async function deleteAdminExperience(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/admin/experiences/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to delete experience");
+  }
+}
+
+export async function updateAdminExperience(
+  token: string,
+  id: number,
+  data: Partial<Experience>
+): Promise<Experience> {
+  const res = await fetch(`${API_BASE_URL}/admin/experiences/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update experience");
+  }
+  const json: APIResponse<Experience> = await res.json();
+  return json.data;
+}
+
+export async function deleteAdminArticle(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/articles/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to delete article");
+  }
+}
+
+export async function updateAdminArticle(
+  token: string,
+  id: number,
+  data: Partial<Article>
+): Promise<Article> {
+  const res = await fetch(`${API_BASE_URL}/admin/articles/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to update article");
+  }
+  const json: APIResponse<Article> = await res.json();
+  return json.data;
+}
+
+export async function markContactMessageRead(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/admin/messages/${id}/read`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to mark message as read");
+  }
+}
+
+export async function deleteContactMessage(
+  token: string,
+  id: number
+): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/admin/messages/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to delete message");
+  }
+}
+
+export async function uploadAdminFile(
+  token: string,
+  file: File
+): Promise<{ url: string; filename: string; size: number }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE_URL}/admin/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || err.message || "Failed to upload file");
+  }
+
+  const json: APIResponse<{ url: string; filename: string; size: number }> =
+    await res.json();
+  return json.data;
+}
+
+
+
 
