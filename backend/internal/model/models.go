@@ -84,3 +84,19 @@ type ContactMessage struct {
 	IsRead    bool      `gorm:"default:false" json:"is_read"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type Article struct {
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Title       string    `gorm:"size:255;not null" json:"title"`
+	Slug        string    `gorm:"uniqueIndex;size:255;not null" json:"slug"`
+	Excerpt     string    `gorm:"size:500" json:"excerpt"`
+	Content     string    `gorm:"type:text;not null" json:"content"`
+	Category    string    `gorm:"size:100;default:'Engineering'" json:"category"`
+	ReadingTime string    `gorm:"size:50;default:'5 min read'" json:"reading_time"`
+	PublishedAt time.Time `json:"published_at"`
+	IsPublished bool      `gorm:"default:true" json:"is_published"`
+	OrderIndex  int       `gorm:"default:0" json:"order_index"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+

@@ -143,3 +143,36 @@ func (r *Repository) MarkContactMessageAsRead(id uint) error {
 func (r *Repository) DeleteContactMessage(id uint) error {
 	return r.db.Delete(&model.ContactMessage{}, id).Error
 }
+
+// Article repository
+func (r *Repository) GetArticles(publishedOnly bool) ([]model.Article, error) {
+	var articles []model.Article
+	query := r.db.Order("order_index ASC, published_at DESC, created_at DESC")
+	if publishedOnly {
+		query = query.Where("is_published = ?", true)
+	}
+	err := query.Find(&articles).Error
+	return articles, err
+}
+
+func (r *Repository) GetArticleBySlug(slug string) (*model.Article, error) {
+	var article model.Article
+	err := r.db.Where("slug = ?", slug).First(&article).Error
+	if err != nil {
+		return nil, err
+	}
+	return &article, nil
+}
+
+func (r *Repository) CreateArticle(article *model.Article) error {
+	return r.db.Create(article).Error
+}
+
+func (r *Repository) UpdateArticle(article *model.Article) error {
+	return r.db.Save(article).Error
+}
+
+func (r *Repository) DeleteArticle(id uint) error {
+	return r.db.Delete(&model.Article{}, id).Error
+}
+

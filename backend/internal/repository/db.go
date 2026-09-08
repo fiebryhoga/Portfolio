@@ -63,6 +63,7 @@ func InitDB(cfg *config.Config) (*Database, error) {
 		&model.Skill{},
 		&model.Experience{},
 		&model.ContactMessage{},
+		&model.Article{},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("database auto-migration failed: %w", err)
@@ -369,4 +370,165 @@ func SeedData(db *gorm.DB, cfg *config.Config) {
 		}
 		log.Println("Experiences seeded for Dimas Fiebry Prayhoga Putra.")
 	}
+
+	// 6. Seed Articles / Writings
+	var articleCount int64
+	db.Model(&model.Article{}).Count(&articleCount)
+	if articleCount == 0 {
+		articles := []model.Article{
+			{
+				Title:       "Architecting the Integrated Soccer Monitoring System (ISMS) for Persebaya Surabaya",
+				Slug:        "architecting-isms-persebaya-surabaya",
+				Excerpt:     "A technical breakdown of how we engineered a mission-critical athletic load monitoring platform integrating ACWR models, VALD Hub datasets, and neuromuscular readiness scoring.",
+				Category:    "Sports Analytics",
+				ReadingTime: "6 min read",
+				PublishedAt: time.Now().Add(-72 * time.Hour),
+				IsPublished: true,
+				OrderIndex:  1,
+				Content: `### Introduction & Problem Statement
+
+Professional football teams demand rapid, high-precision analytics to prevent non-contact injuries and maximize athletic output across congested fixture schedules. During my tenure as Fullstack Developer and Assistant Performance Analyst at **PT. Suyoko Fit Sejahtera for Persebaya Surabaya**, we identified a key operational bottleneck: physical performance datasets from disparate hardware ecosystems (GPS trackers, force plates, subjective wellness forms) were fragmented across spreadsheets.
+
+To resolve this, we architected the **Integrated Soccer Monitoring System (ISMS)**: a centralized sports intelligence platform built exclusively for Persebaya Surabaya.
+
+---
+
+### Core Architectural Pillars
+
+1. **Daily Wellness & Subjective RPE Collection**:
+   - Player self-assessment engines recording sleep quality, muscle soreness, stress, and Rating of Perceived Exertion (RPE).
+   - Instant anomaly detection flagging acute dips in wellness before morning training sessions.
+
+2. **Acute:Chronic Workload Ratio (ACWR) Calculation Engine**:
+   - Multi-model workload processing implementing Rolling Average (RA), Exponentially Weighted Moving Average (EWMA), and Weekly Microcycle distributions.
+   - The ratio compares immediate acute workload (7 days) against historical chronic workload (28 days) to pinpoint the "sweet spot" of high fitness with minimal injury risk.
+
+3. **VALD Hub & Force Plate Telemetry Integration**:
+   - Automated ingestion of neuromuscular symmetry scores, eccentric hamstring strength metrics, and countermovement jump (CMJ) force-time curves.
+   - Algorithmic generation of the **Player Performance Readiness Index (PPRI)** to directly guide head coach and medical staff tactical selections.
+
+---
+
+### Key Takeaways
+
+By converging high-volume telemetry into actionable visual dashboards, technical staff were able to tailor microcycle periodization to individual player tolerance thresholds, demonstrating the immense value of software engineering in elite sports performance.`,
+			},
+			{
+				Title:       "Concurrency in Go: Building High-Throughput REST APIs with Gin & Channels",
+				Slug:        "concurrency-in-go-gin-channels",
+				Excerpt:     "Practical patterns for leveraging lightweight goroutines, worker pools, and buffered channels to handle concurrent requests without thread starvation.",
+				Category:    "Backend Engineering",
+				ReadingTime: "5 min read",
+				PublishedAt: time.Now().Add(-140 * time.Hour),
+				IsPublished: true,
+				OrderIndex:  2,
+				Content: `### Why Concurrency Matters in Modern Backend Architecture
+
+In traditional thread-per-request architectures, scaling to thousands of concurrent requests rapidly exhausts server memory. The Go runtime resolves this with **Goroutines**—cooperatively scheduled green threads requiring as little as 2KB of initial stack memory.
+
+When pairing the high-performance **Gin Web Framework** with Go's channel primitives, you can build production microservices capable of processing high-volume workloads with single-digit millisecond latency.
+
+---
+
+### Pattern 1: Non-Blocking Background Tasks with Worker Pools
+
+Instead of spawning unbounded goroutines on every HTTP request, leverage a worker pool with a buffered channel queue:
+
+` + "```go" + `
+type Job struct {
+    Payload   []byte
+    ResultChan chan error
 }
+
+func WorkerPool(jobs <-chan Job, numWorkers int) {
+    for i := 0; i < numWorkers; i++ {
+        go func(id int) {
+            for job := range jobs {
+                // Process job asynchronously
+                job.ResultChan <- processPayload(job.Payload)
+            }
+        }(i)
+    }
+}
+` + "```" + `
+
+---
+
+### Pattern 2: Context Cancellation & Timeout Management
+
+Always propagate ` + "`context.Context`" + ` from the incoming Gin request:
+
+` + "```go" + `
+func HandleTask(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+    defer cancel()
+
+    select {
+    case res := <-performWork(ctx):
+        c.JSON(http.StatusOK, res)
+    case <-ctx.Done():
+        c.JSON(http.StatusGatewayTimeout, gin.H{"error": "Request deadline exceeded"})
+    }
+}
+` + "```" + `
+
+---
+
+### Conclusion
+
+Embracing Go's concurrency idioms enables clean, resilient backend architectures that scale horizontally with minimal hardware footprint.`,
+			},
+			{
+				Title:       "The Inertia.js Paradigm: Bridging Laravel and React for Modern Fullstack Apps",
+				Slug:        "inertiajs-laravel-react-fullstack-paradigm",
+				Excerpt:     "How Inertia.js eliminates the friction of building separate client-side SPAs and REST APIs while keeping the developer velocity of classic monoliths.",
+				Category:    "Fullstack Architecture",
+				ReadingTime: "4 min read",
+				PublishedAt: time.Now().Add(-200 * time.Hour),
+				IsPublished: true,
+				OrderIndex:  3,
+				Content: `### The Modern Monolith Alternative
+
+Building modern web applications often forces developers to choose between two extremes:
+1. **Server-Side Rendered (SSR) Blade/Blade templates**: Rapid productivity, but clunky full-page reloads and limited client-side reactivity.
+2. **Decoupled SPA + REST/GraphQL API**: Smooth client interactions, but duplicate validation logic, manual JWT token handling, and complex state management overhead.
+
+**Inertia.js** offers a third, elegant path: The modern monolith.
+
+---
+
+### How Inertia Works Under the Hood
+
+Inertia is not a framework; it is an architectural adapter. It replaces server-side view engines with client-side component renderers (React, Vue, or Svelte).
+
+- Your routes and controllers remain 100% Laravel:
+` + "```php" + `
+public function show(Project $project)
+{
+    return Inertia::render('Projects/Detail', [
+        'project' => $project->load('metrics'),
+    ]);
+}
+` + "```" + `
+- The client receives pure JSON props automatically injected into the React component:
+` + "```tsx" + `
+export default function Detail({ project }: Props) {
+    return <h1>{project.title}</h1>;
+}
+` + "```" + `
+
+---
+
+### Summary
+
+For teams that prioritize rapid shipping, type safety, and seamless UX without the complexity of managing two separate codebases, Laravel + Inertia.js + React is an unrivaled fullstack stack.`,
+			},
+		}
+
+		for _, a := range articles {
+			db.Create(&a)
+		}
+		log.Println("Articles seeded for Dimas Fiebry Prayhoga Putra.")
+	}
+}
+

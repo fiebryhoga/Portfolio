@@ -34,6 +34,8 @@ type DesktopContextType = {
   theme: "dark" | "light";
   toggleTheme: () => void;
   setTheme: (theme: "dark" | "light") => void;
+  spotlightOpen: boolean;
+  setSpotlightOpen: (val: boolean | ((prev: boolean) => boolean)) => void;
   windows: { id: string; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean; zIndex: number }[];
 };
 
@@ -42,6 +44,21 @@ const DesktopContext = createContext<DesktopContextType | undefined>(undefined);
 export function DesktopProvider({ children }: { children: ReactNode }) {
   // Theme state: dark by default, synced with localStorage and html class
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
+  const [spotlightOpen, setSpotlightOpen] = useState<boolean>(false);
+
+  // Global keyboard shortcut for Spotlight Search (Cmd+K / Ctrl+K / Esc)
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSpotlightOpen((prev) => !prev);
+      } else if (e.key === "Escape") {
+        setSpotlightOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   React.useEffect(() => {
     try {
@@ -175,6 +192,8 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
         theme,
         toggleTheme,
         setTheme,
+        spotlightOpen,
+        setSpotlightOpen,
         windows,
       }}
     >

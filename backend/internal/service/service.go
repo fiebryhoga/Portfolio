@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 	"time"
 
@@ -189,3 +190,38 @@ func (s *Service) MarkContactMessageRead(id uint) error {
 func (s *Service) DeleteContactMessage(id uint) error {
 	return s.repo.DeleteContactMessage(id)
 }
+
+// Articles
+func (s *Service) GetArticles(publishedOnly bool) ([]model.Article, error) {
+	return s.repo.GetArticles(publishedOnly)
+}
+
+func (s *Service) GetArticleBySlug(slug string) (*model.Article, error) {
+	return s.repo.GetArticleBySlug(slug)
+}
+
+func (s *Service) CreateArticle(a *model.Article) error {
+	if a.Slug == "" {
+		slug := strings.ToLower(strings.ReplaceAll(a.Title, " ", "-"))
+		// remove non-alphanumeric except hyphen
+		reg := regexp.MustCompile(`[^a-z0-9-]+`)
+		a.Slug = reg.ReplaceAllString(slug, "")
+	}
+	if a.PublishedAt.IsZero() {
+		a.PublishedAt = time.Now()
+	}
+	a.CreatedAt = time.Now()
+	a.UpdatedAt = time.Now()
+	return s.repo.CreateArticle(a)
+}
+
+func (s *Service) UpdateArticle(id uint, a *model.Article) error {
+	a.ID = id
+	a.UpdatedAt = time.Now()
+	return s.repo.UpdateArticle(a)
+}
+
+func (s *Service) DeleteArticle(id uint) error {
+	return s.repo.DeleteArticle(id)
+}
+

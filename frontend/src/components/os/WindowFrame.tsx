@@ -33,25 +33,41 @@ export default function WindowFrame({ id, title, children }: WindowFrameProps) {
 
   // Auto-center in Stage Manager mode on mount or window resize
   useEffect(() => {
-    if (typeof window !== "undefined" && !hasCustomPosition) {
+    const updateDimensions = () => {
+      if (typeof window === "undefined") return;
+
       const screenW = window.innerWidth;
       const screenH = window.innerHeight;
 
-      // On screens with Stage Manager rail (> 768px), leave room on the left
-      const isDesktopScreen = screenW >= 768 && stageManagerOpen;
-      const leftOffset = isDesktopScreen ? 160 : 16;
-      const availableW = screenW - leftOffset - 24;
-      const availableH = screenH - 44 - 96;
+      // On mobile / small screens (< 768px): Window spans full screen
+      if (screenW < 768) {
+        setSize({ width: screenW - 16, height: screenH - 44 - 60 });
+        setPosition({ x: 8, y: 44 });
+        return;
+      }
 
-      const targetW = Math.min(1080, Math.max(500, availableW));
-      const targetH = Math.min(760, Math.max(400, availableH));
+      // On desktop screens (>= 768px):
+      if (!hasCustomPosition) {
+        const isDesktopScreen = screenW >= 768 && stageManagerOpen;
+        const leftOffset = isDesktopScreen ? 140 : 16;
+        const availableW = screenW - leftOffset - 32;
+        const availableH = screenH - 44 - 96;
 
-      const posX = leftOffset + Math.max(0, Math.floor((availableW - targetW) / 2));
-      const posY = 40 + Math.max(0, Math.floor((availableH - targetH) / 2));
+        // Default spacious, elegant width on desktop
+        const targetW = Math.min(1080, Math.max(340, Math.floor(availableW * 0.94)));
+        const targetH = Math.min(780, Math.max(400, availableH));
 
-      setSize({ width: targetW, height: targetH });
-      setPosition({ x: posX, y: posY });
-    }
+        const posX = leftOffset + Math.max(0, Math.floor((availableW - targetW) / 2));
+        const posY = 46 + Math.max(0, Math.floor((availableH - targetH) / 2));
+
+        setSize({ width: targetW, height: targetH });
+        setPosition({ x: posX, y: posY });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
   }, [hasCustomPosition, stageManagerOpen]);
 
   // Drag Titlebar
@@ -74,7 +90,7 @@ export default function WindowFrame({ id, title, children }: WindowFrameProps) {
 
       setPosition({
         x: startPosX + dx,
-        y: Math.max(28, startPosY + dy),
+        y: Math.max(36, startPosY + dy),
       });
     };
 
@@ -134,7 +150,7 @@ export default function WindowFrame({ id, title, children }: WindowFrameProps) {
         const calculatedHeight = startH - dy;
         if (calculatedHeight >= minH) {
           newHeight = calculatedHeight;
-          newY = Math.max(28, startPosY + dy);
+          newY = Math.max(36, startPosY + dy);
         } else {
           newHeight = minH;
           newY = startPosY + (startH - minH);
@@ -164,9 +180,9 @@ export default function WindowFrame({ id, title, children }: WindowFrameProps) {
         scale: 1,
         y: 0,
         left: isMaximized ? 0 : position.x,
-        top: isMaximized ? 28 : position.y,
+        top: isMaximized ? 36 : position.y,
         width: isMaximized ? "100vw" : size.width,
-        height: isMaximized ? "calc(100vh - 28px - 80px)" : size.height,
+        height: isMaximized ? "calc(100vh - 36px - 80px)" : size.height,
       }}
       exit={{ opacity: 0, scale: 0.97, y: -8 }}
       transition={
@@ -246,8 +262,8 @@ export default function WindowFrame({ id, title, children }: WindowFrameProps) {
         </div>
       </div>
 
-      {/* Content Area with custom smooth scrollbar */}
-      <div className={`flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-4 custom-window-scrollbar select-text ${isDark ? "text-zinc-100" : "text-zinc-900"}`}>
+      {/* Content Area with custom smooth scrollbar & container query context */}
+      <div className={`flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-4 custom-window-scrollbar select-text @container ${isDark ? "text-zinc-100" : "text-zinc-900"}`}>
         {children}
       </div>
 

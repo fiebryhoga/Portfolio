@@ -7,6 +7,8 @@ import MenuBar from "./MenuBar";
 import Dock from "./Dock";
 import StageManagerRail from "./StageManagerRail";
 import WindowFrame from "./WindowFrame";
+import SpotlightSearch from "./SpotlightSearch";
+import DesktopWallpaper from "./DesktopWallpaper";
 
 // Apps Content
 import { Hero } from "@/components/Hero";
@@ -40,11 +42,12 @@ export default function Desktop({ profile, projects, skills, experiences }: Desk
   return (
     <div
       className={`h-screen w-screen overflow-hidden relative select-none transform-gpu transition-colors duration-250 ${
-        isDark
-          ? "bg-[#09090b] text-zinc-100 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06)_0%,transparent_40%),radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.03)_0%,transparent_50%)]"
-          : "bg-[#ececec] text-zinc-900 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.85)_0%,transparent_45%),radial-gradient(circle_at_80%_75%,rgba(0,0,0,0.04)_0%,transparent_50%)]"
+        isDark ? "bg-[#09090b] text-zinc-100" : "bg-[#e5e5ea] text-zinc-900"
       }`}
     >
+      {/* Background Wallpaper: Topographic Silhouette & Apple Watermark */}
+      <DesktopWallpaper />
+
       {/* Top MenuBar */}
       <MenuBar />
 
@@ -82,7 +85,7 @@ export default function Desktop({ profile, projects, skills, experiences }: Desk
             )}
 
             {activeApp && activeApp.id === "contact" && (
-              <WindowFrame key="contact" id="contact" title="Terminal — dimas@macbook ~ %">
+              <WindowFrame key="contact" id="contact" title="Contact & Terminal — Dimas Fiebry">
                 <Contact profile={profile} />
               </WindowFrame>
             )}
@@ -92,6 +95,9 @@ export default function Desktop({ profile, projects, skills, experiences }: Desk
 
       {/* Bottom Dock */}
       <Dock />
+
+      {/* macOS Spotlight Search Modal */}
+      <SpotlightSearch />
     </div>
   );
 }

@@ -43,6 +43,9 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 		v1.GET("/projects/:slug", h.GetProjectBySlug)
 		v1.GET("/skills", h.GetSkills)
 		v1.GET("/experiences", h.GetExperiences)
+		v1.GET("/articles", h.GetArticles)
+		v1.GET("/articles/:slug", h.GetArticleBySlug)
+		v1.POST("/articles", h.CreateArticle)
 		v1.POST("/contact", h.SubmitContact)
 
 		// Auth
@@ -71,6 +74,11 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 			protected.POST("/admin/experiences", h.CreateExperience)
 			protected.PUT("/admin/experiences/:id", h.UpdateExperience)
 			protected.DELETE("/admin/experiences/:id", h.DeleteExperience)
+
+			// Admin Articles
+			protected.POST("/admin/articles", h.CreateArticle)
+			protected.PUT("/admin/articles/:id", h.UpdateArticle)
+			protected.DELETE("/admin/articles/:id", h.DeleteArticle)
 
 			// Admin Messages
 			protected.GET("/admin/messages", h.GetContactMessages)
@@ -393,3 +401,80 @@ func (h *Handler) DeleteMessage(c *gin.Context) {
 	}
 	utils.SendSuccess(c, http.StatusOK, "Message deleted successfully", nil)
 }
+
+// Articles Handlers
+func (h *Handler) GetArticles(c *gin.Context) {
+	publishedOnly := c.DefaultQuery("all", "false") != "true"
+	articles, err := h.svc.GetArticles(publishedOnly)
+	if err != nil {
+		utils.SendInternalServerError(c, "Failed to retrieve articles", err)
+		return
+	}
+	utils.SendSuccess(c, http.StatusOK, "Articles retrieved successfully", articles)
+}
+
+func (h *Handler) GetArticleBySlug(c *gin.Context) {
+	slug := c.Param("slug")
+	article, err := h.svc.GetArticleBySlug(slug)
+	if err != nil {
+		utils.SendNotFound(c, "Article not found")
+		return
+	}
+	utils.SendSuccess(c, http.StatusOK, "Article retrieved successfully", article)
+}
+
+func (h *Handler) CreateArticle(c *gin.Context) {
+	var article model.Article
+	if err := c.ShouldBindJSON(&article); err != nil {
+		utils.SendBadRequest(c, "Invalid article payload", err)
+		return
+	}
+
+	if article.Title == "" || article.Content == "" {
+		utils.SendBadRequest(c, "Title and Content are required", nil)
+		return
+	}
+
+	if err := h.svc.CreateArticle(&article); err != nil {
+		utils.SendInternalServerError(c, "Failed to publish article", err)
+		return
+	}
+	utils.SendSuccess(c, http.StatusCreated, "Article published successfully", article)
+}
+
+func (h *Handler) UpdateArticle(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		utils.SendBadRequest(c, "Invalid article ID", err)
+		return
+	}
+
+	var article model.Article
+	if err := c.ShouldBindJSON(&article); err != nil {
+		utils.SendBadRequest(c, "Invalid article payload", err)
+		return
+	}
+
+	if err := h.svc.UpdateArticle(uint(id), &article); err != nil {
+		utils.SendInternalServerError(c, "Failed to update article", err)
+		return
+	}
+	utils.SendSuccess(c, http.StatusOK, "Article updated successfully", article)
+}
+
+func (h *Handler) DeleteArticle(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		utils.SendBadRequest(c, "Invalid article ID", err)
+		return
+	}
+
+	if err := h.svc.DeleteArticle(uint(id)); err != nil {
+		utils.SendInternalServerError(c, "Failed to delete article", err)
+		return
+	}
+	utils.SendSuccess(c, http.StatusOK, "Article deleted successfully", nil)
+}
+
