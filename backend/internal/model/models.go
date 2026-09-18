@@ -18,8 +18,12 @@ type Profile struct {
 	ID               uint      `gorm:"primaryKey" json:"id"`
 	Name             string    `gorm:"size:100;not null" json:"name"`
 	Headline         string    `gorm:"size:255" json:"headline"`
-	Bio              string    `gorm:"type:text" json:"bio"`
-	AvatarURL        string    `gorm:"size:500" json:"avatar_url"`
+	Bio               string    `gorm:"type:text" json:"bio"`
+	Philosophy        string    `gorm:"type:text" json:"philosophy"`
+	EducationTitle    string    `gorm:"size:150" json:"education_title"`
+	EducationDegree   string    `gorm:"size:150" json:"education_degree"`
+	EducationGPA      string    `gorm:"size:50" json:"education_gpa"`
+	AvatarURL         string    `gorm:"size:500" json:"avatar_url"`
 	ResumeURL        string    `gorm:"size:500" json:"resume_url"`
 	GithubURL        string    `gorm:"size:255" json:"github_url"`
 	LinkedinURL      string    `gorm:"size:255" json:"linkedin_url"`

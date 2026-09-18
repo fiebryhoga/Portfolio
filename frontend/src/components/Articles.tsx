@@ -39,6 +39,13 @@ export const Articles: React.FC<ArticlesProps> = ({
   const [selectedSlug, setSelectedSlug] = useState<string>(
     initialArticles[0]?.slug || ""
   );
+
+  React.useEffect(() => {
+    setArticles(initialArticles);
+    if (!selectedSlug && initialArticles.length > 0) {
+      setSelectedSlug(initialArticles[0].slug);
+    }
+  }, [initialArticles]);
   const [activeTab, setActiveTab] = useState<"read" | "publish">("read");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");

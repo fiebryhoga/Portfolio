@@ -170,7 +170,30 @@ export default function AdminPortal() {
     }
   }, [token]);
 
+  const handleLogout = (showNotification = true) => {
+    setToken(null);
+    try {
+      localStorage.removeItem("portfolio_admin_jwt");
+    } catch {
+      // ignore
+    }
+    if (showNotification) {
+      notify("success", "Signed out successfully.");
+    }
+  };
+
   const notify = (type: "success" | "error", text: string) => {
+    if (
+      text.toLowerCase().includes("unauthorized") ||
+      text.toLowerCase().includes("invalid or expired") ||
+      text.toLowerCase().includes("expired authorization token")
+    ) {
+      handleLogout(false);
+      setAuthError(
+        "Sesi login Anda telah berakhir (database baru saja dialihkan ke PostgreSQL). Silakan klik 'Quick Fill Credentials' lalu Sign In."
+      );
+      return;
+    }
     setFeedback({ type, text });
     setTimeout(() => setFeedback(null), 3500);
   };
@@ -187,7 +210,7 @@ export default function AdminPortal() {
       } catch {
         // ignore
       }
-      notify("success", "Successfully authenticated with Go Gin API!");
+      notify("success", "Successfully authenticated with Go Gin API & PostgreSQL!");
     } catch (err: unknown) {
       setAuthError(
         err instanceof Error
@@ -199,16 +222,6 @@ export default function AdminPortal() {
     }
   };
 
-  const handleLogout = () => {
-    setToken(null);
-    try {
-      localStorage.removeItem("portfolio_admin_jwt");
-    } catch {
-      // ignore
-    }
-    notify("success", "Signed out successfully.");
-  };
-
   // --- Profile Operations ---
   const handleSaveProfile = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -218,7 +231,10 @@ export default function AdminPortal() {
       const updated = await updateAdminProfile(token, profileForm);
       setProfile(updated);
       setProfileForm(updated);
-      notify("success", "Profile updated successfully in SQLite & API!");
+      notify("success", "Profil berhasil disimpan ke PostgreSQL Database!");
+      try {
+        window.dispatchEvent(new CustomEvent("portfolio-content-updated"));
+      } catch {}
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Failed to update profile");
     } finally {
@@ -240,7 +256,10 @@ export default function AdminPortal() {
       // Auto-save immediately to database
       const updated = await updateAdminProfile(token, newForm);
       setProfile(updated);
-      notify("success", "Foto profil berhasil diupload dan disimpan!");
+      notify("success", "Foto profil berhasil diupload dan disimpan ke PostgreSQL!");
+      try {
+        window.dispatchEvent(new CustomEvent("portfolio-content-updated"));
+      } catch {}
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Gagal mengupload foto profil");
     } finally {
@@ -291,6 +310,7 @@ export default function AdminPortal() {
         );
         notify("success", `Project "${updated.title}" updated successfully!`);
       }
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       setEditingProject(null);
       setIsNewProject(false);
     } catch (err: unknown) {
@@ -307,6 +327,7 @@ export default function AdminPortal() {
     try {
       await deleteAdminProject(token, id);
       setProjects((prev) => prev.filter((p) => p.id !== id));
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       notify("success", `Project "${title}" deleted.`);
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Failed to delete project");
@@ -332,6 +353,7 @@ export default function AdminPortal() {
         );
         notify("success", `Skill "${updated.name}" updated!`);
       }
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       setEditingSkill(null);
       setIsNewSkill(false);
     } catch (err: unknown) {
@@ -348,6 +370,7 @@ export default function AdminPortal() {
     try {
       await deleteAdminSkill(token, id);
       setSkills((prev) => prev.filter((s) => s.id !== id));
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       notify("success", `Skill "${name}" removed.`);
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Failed to delete skill");
@@ -373,6 +396,7 @@ export default function AdminPortal() {
         );
         notify("success", `Experience at "${updated.company}" updated!`);
       }
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       setEditingExp(null);
       setIsNewExp(false);
     } catch (err: unknown) {
@@ -389,6 +413,7 @@ export default function AdminPortal() {
     try {
       await deleteAdminExperience(token, id);
       setExperiences((prev) => prev.filter((e) => e.id !== id));
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       notify("success", `Experience at "${company}" removed.`);
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Failed to delete experience");
@@ -414,6 +439,7 @@ export default function AdminPortal() {
         );
         notify("success", `Article "${updated.title}" updated!`);
       }
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       setEditingArticle(null);
       setIsNewArticle(false);
     } catch (err: unknown) {
@@ -430,6 +456,7 @@ export default function AdminPortal() {
     try {
       await deleteAdminArticle(token, id);
       setArticles((prev) => prev.filter((a) => a.id !== id));
+      try { window.dispatchEvent(new CustomEvent("portfolio-content-updated")); } catch {}
       notify("success", `Article "${title}" deleted.`);
     } catch (err: unknown) {
       notify("error", err instanceof Error ? err.message : "Failed to delete article");
@@ -528,7 +555,7 @@ export default function AdminPortal() {
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => handleLogout(true)}
                   className="px-2.5 py-1 rounded-md text-xs font-medium text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-1"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -1963,7 +1990,7 @@ export default function AdminPortal() {
 
                   {messages.length === 0 ? (
                     <div className="py-12 text-center text-xs text-zinc-400">
-                      No incoming messages found in the SQLite database.
+                      Belum ada pesan masuk di database PostgreSQL.
                     </div>
                   ) : (
                     <div className="space-y-2.5">

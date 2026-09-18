@@ -48,8 +48,27 @@ export const Projects: React.FC<ProjectsProps> = ({ projects }) => {
   const categories = [
     { id: "all", label: "All Projects", count: projects.length },
     { id: "featured", label: "Featured Only", count: projects.filter((p) => p.featured).length },
-    { id: "sports", label: "Sports Analytics", count: 2 },
-    { id: "enterprise", label: "Enterprise & ERP", count: 3 },
+    {
+      id: "sports",
+      label: "Sports Analytics",
+      count: projects.filter(
+        (p) =>
+          p.title.toLowerCase().includes("soccer") ||
+          p.title.toLowerCase().includes("isms") ||
+          p.title.toLowerCase().includes("performance")
+      ).length,
+    },
+    {
+      id: "enterprise",
+      label: "Enterprise & ERP",
+      count: projects.filter(
+        (p) =>
+          p.title.toLowerCase().includes("erp") ||
+          p.title.toLowerCase().includes("inventory") ||
+          p.title.toLowerCase().includes("archive") ||
+          p.title.toLowerCase().includes("metro")
+      ).length,
+    },
   ];
 
   const filteredProjects = projects.filter((project) => {

@@ -39,6 +39,8 @@ type DesktopContextType = {
   setSpotlightOpen: (val: boolean | ((prev: boolean) => boolean)) => void;
   adminPortalOpen: boolean;
   setAdminPortalOpen: (val: boolean | ((prev: boolean) => boolean)) => void;
+  isFullscreen: boolean;
+  toggleFullscreen: () => Promise<void>;
   windows: { id: string; title: string; isOpen: boolean; isMinimized: boolean; isMaximized: boolean; zIndex: number }[];
 };
 
@@ -49,8 +51,52 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [spotlightOpen, setSpotlightOpen] = useState<boolean>(false);
   const [adminPortalOpen, setAdminPortalOpen] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  // Global keyboard shortcut for Spotlight Search (Cmd+K) & Admin Portal (Cmd+Shift+A)
+  // Sync fullscreen state with browser events
+  React.useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if ((document.documentElement as unknown as { webkitRequestFullscreen?: () => Promise<void> }).webkitRequestFullscreen) {
+          await (document.documentElement as unknown as { webkitRequestFullscreen: () => Promise<void> }).webkitRequestFullscreen();
+        } else if ((document.documentElement as unknown as { msRequestFullscreen?: () => Promise<void> }).msRequestFullscreen) {
+          await (document.documentElement as unknown as { msRequestFullscreen: () => Promise<void> }).msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as unknown as { webkitExitFullscreen?: () => Promise<void> }).webkitExitFullscreen) {
+          await (document as unknown as { webkitExitFullscreen: () => Promise<void> }).webkitExitFullscreen();
+        } else if ((document as unknown as { msExitFullscreen?: () => Promise<void> }).msExitFullscreen) {
+          await (document as unknown as { msExitFullscreen: () => Promise<void> }).msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn("Fullscreen toggle error:", err);
+    }
+  };
+
+  // Global keyboard shortcut for Spotlight Search (Cmd+K), Admin Portal (Cmd+Shift+A), & Fullscreen (F11 / Ctrl+Cmd+F)
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cmd + Shift + A or Ctrl + Shift + A => Toggle Admin Portal
@@ -63,6 +109,12 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setSpotlightOpen((prev) => !prev);
+        return;
+      }
+      // F11 or Ctrl + Cmd + F / Ctrl + Meta + F => Toggle Fullscreen
+      if (e.key === "F11" || (e.ctrlKey && e.metaKey && e.key.toLowerCase() === "f")) {
+        e.preventDefault();
+        toggleFullscreen();
         return;
       }
       if (e.key === "Escape") {
@@ -209,6 +261,8 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
         setSpotlightOpen,
         adminPortalOpen,
         setAdminPortalOpen,
+        isFullscreen,
+        toggleFullscreen,
         windows,
       }}
     >

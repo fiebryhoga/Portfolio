@@ -354,7 +354,7 @@ For teams that prioritize rapid shipping, type safety, and seamless UX without t
 
 export async function fetchProfile(): Promise<Profile> {
   try {
-    const res = await fetch(`${API_BASE_URL}/profile`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/profile`, { cache: "no-store" });
     if (!res.ok) throw new Error("Backend not available");
     const json: APIResponse<Profile> = await res.json();
     return json.data || fallbackProfile;
@@ -365,7 +365,7 @@ export async function fetchProfile(): Promise<Profile> {
 
 export async function fetchProjects(): Promise<Project[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/projects`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/projects`, { cache: "no-store" });
     if (!res.ok) throw new Error("Backend not available");
     const json: APIResponse<Project[]> = await res.json();
     return json.data && json.data.length > 0 ? json.data : fallbackProjects;
@@ -376,7 +376,7 @@ export async function fetchProjects(): Promise<Project[]> {
 
 export async function fetchSkills(): Promise<Skill[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/skills`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/skills`, { cache: "no-store" });
     if (!res.ok) throw new Error("Backend not available");
     const json: APIResponse<Skill[]> = await res.json();
     return json.data && json.data.length > 0 ? json.data : fallbackSkills;
@@ -387,7 +387,7 @@ export async function fetchSkills(): Promise<Skill[]> {
 
 export async function fetchExperiences(): Promise<Experience[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/experiences`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_BASE_URL}/experiences`, { cache: "no-store" });
     if (!res.ok) throw new Error("Backend not available");
     const json: APIResponse<Experience[]> = await res.json();
     return json.data && json.data.length > 0 ? json.data : fallbackExperiences;
@@ -457,7 +457,7 @@ export async function fetchContactMessages(token: string): Promise<ContactMessag
 export async function fetchArticles(): Promise<Article[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/articles`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (!res.ok) throw new Error("Backend not available");
     const json: APIResponse<Article[]> = await res.json();
@@ -469,7 +469,9 @@ export async function fetchArticles(): Promise<Article[]> {
 
 export async function fetchArticleBySlug(slug: string): Promise<Article | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/articles/${slug}`);
+    const res = await fetch(`${API_BASE_URL}/articles/${slug}`, {
+      cache: "no-store",
+    });
     if (!res.ok) throw new Error("Article not found");
     const json: APIResponse<Article> = await res.json();
     return json.data;

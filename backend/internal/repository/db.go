@@ -32,15 +32,18 @@ func InitDB(cfg *config.Config) (*Database, error) {
 			"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=UTC",
 			cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort, cfg.DBSSLMode,
 		)
-		log.Printf("Connecting to PostgreSQL at %s:%s...", cfg.DBHost, cfg.DBPort)
+		log.Printf("Connecting to PostgreSQL at %s:%s (DB: %s)...", cfg.DBHost, cfg.DBPort, cfg.DBName)
 		db, err = gorm.Open(postgres.Open(dsn), gormConfig)
 		if err != nil {
-			log.Printf("Warning: Failed to connect to PostgreSQL (%v). Falling back to SQLite database: %s", err, cfg.DBSqlitePath)
-			db, err = gorm.Open(sqlite.Open(cfg.DBSqlitePath), gormConfig)
+			return nil, fmt.Errorf("failed to connect to PostgreSQL at %s:%s: %w", cfg.DBHost, cfg.DBPort, err)
 		}
+		log.Printf("✅ Successfully connected to PostgreSQL (%s) on %s:%s", cfg.DBName, cfg.DBHost, cfg.DBPort)
 	} else {
 		log.Printf("Using SQLite database at %s...", cfg.DBSqlitePath)
 		db, err = gorm.Open(sqlite.Open(cfg.DBSqlitePath), gormConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to open SQLite database: %w", err)
+		}
 	}
 
 	if err != nil {
@@ -121,6 +124,10 @@ func SeedData(db *gorm.DB, cfg *config.Config) {
 			Name:             "Dimas Fiebry Prayhoga Putra",
 			Headline:         "Versatile Fullstack Developer & Performance Systems Engineer",
 			Bio:              "Versatile Fullstack Developer with a strong track record of architecting and deploying scalable web applications, ranging from enterprise-level sports analytics platforms to comprehensive business management solutions. Combining a solid academic foundation from Universitas Brawijaya with extensive hands-on experience in API integrations, database architecture, and end-to-end project management.",
+			Philosophy:       "I bring a wide range of skills across systems architecture, database design, and modern frontend frameworks. Whether architecting concurrent Go Gin services, building fullstack Laravel applications, or crafting fluid interfaces with React, Next.js, and TypeScript, I prioritize clean code, reliability, and exceptional user experiences.",
+			EducationTitle:   "Universitas Brawijaya",
+			EducationDegree:  "Bachelor of Information Systems • 2022 — 2026",
+			EducationGPA:     "GPA 3.60 / 4.00",
 			AvatarURL:        "http://localhost:8080/uploads/1788842474245918000.jpg",
 			ResumeURL:        "https://fiebryhoga.my.id/",
 			GithubURL:        "https://github.com/fiebryhoga",

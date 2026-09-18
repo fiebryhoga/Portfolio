@@ -72,7 +72,7 @@ export const Hero: React.FC<HeroProps> = ({ profile }) => {
               isDark ? "text-zinc-400" : "text-zinc-600"
             }`}
           >
-            Fullstack Developer &amp; Systems Engineer
+            {profile.headline || "Versatile Fullstack Developer & Performance Systems Engineer"}
           </p>
           <div
             className={`flex items-center gap-3 mt-2 text-xs font-medium ${
@@ -80,14 +80,98 @@ export const Hero: React.FC<HeroProps> = ({ profile }) => {
             }`}
           >
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Available for work
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  profile.available_for_work !== false
+                    ? "bg-emerald-500 animate-pulse"
+                    : "bg-zinc-500"
+                }`}
+              />
+              {profile.available_for_work !== false
+                ? "Available for work"
+                : "Not available"}
             </span>
-            <span>•</span>
-            <span>Surabaya / Malang, ID</span>
+            {profile.location && (
+              <>
+                <span>•</span>
+                <span>{profile.location}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Metrics Row (Experience, Projects, Clients from Database) */}
+      {(profile.years_experience || profile.completed_projects) && (
+        <div className="grid grid-cols-3 gap-2.5 pt-1">
+          <div
+            className={`p-3 rounded-xl border text-center transition-colors ${
+              isDark
+                ? "bg-white/[0.03] border-white/15"
+                : "bg-black/[0.02] border-black/10"
+            }`}
+          >
+            <div
+              className={`text-base font-bold font-mono ${
+                isDark ? "text-white" : "text-zinc-950"
+              }`}
+            >
+              {profile.years_experience}+
+            </div>
+            <div
+              className={`text-[10px] uppercase tracking-wider font-medium mt-0.5 ${
+                isDark ? "text-zinc-400" : "text-zinc-500"
+              }`}
+            >
+              Years Exp
+            </div>
+          </div>
+          <div
+            className={`p-3 rounded-xl border text-center transition-colors ${
+              isDark
+                ? "bg-white/[0.03] border-white/15"
+                : "bg-black/[0.02] border-black/10"
+            }`}
+          >
+            <div
+              className={`text-base font-bold font-mono ${
+                isDark ? "text-white" : "text-zinc-950"
+              }`}
+            >
+              {profile.completed_projects}+
+            </div>
+            <div
+              className={`text-[10px] uppercase tracking-wider font-medium mt-0.5 ${
+                isDark ? "text-zinc-400" : "text-zinc-500"
+              }`}
+            >
+              Projects Done
+            </div>
+          </div>
+          <div
+            className={`p-3 rounded-xl border text-center transition-colors ${
+              isDark
+                ? "bg-white/[0.03] border-white/15"
+                : "bg-black/[0.02] border-black/10"
+            }`}
+          >
+            <div
+              className={`text-base font-bold font-mono ${
+                isDark ? "text-white" : "text-zinc-950"
+              }`}
+            >
+              {profile.satisfied_clients}+
+            </div>
+            <div
+              className={`text-[10px] uppercase tracking-wider font-medium mt-0.5 ${
+                isDark ? "text-zinc-400" : "text-zinc-500"
+              }`}
+            >
+              Satisfied Clients
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. Section: About Me */}
       <div className="space-y-2.5">
@@ -98,31 +182,46 @@ export const Hero: React.FC<HeroProps> = ({ profile }) => {
         >
           About Me
         </h2>
-        <p
-          className={`text-sm leading-relaxed font-normal ${
-            isDark ? "text-zinc-300" : "text-zinc-700"
-          }`}
-        >
-          Hey there! 👋 I&apos;m Dimas, a Fullstack Developer and Information Systems graduate
-          from Universitas Brawijaya (GPA 3.60). I specialize in engineering high-performance
-          web applications, robust backend microservices, and reactive user interfaces.
-        </p>
-        <p
-          className={`text-sm leading-relaxed font-normal ${
-            isDark ? "text-zinc-300" : "text-zinc-700"
-          }`}
-        >
-          Most notably, I architected and engineered the{" "}
-          <strong
-            className={`font-semibold ${
-              isDark ? "text-white" : "text-zinc-950"
-            }`}
-          >
-            Integrated Soccer Monitoring System (ISMS) for Persebaya Surabaya
-          </strong>
-          , a data analytics platform calculating athlete ACWR physical loads, GPS metrics, and
-          medical diagnostics to empower data-driven tactical decisions for elite coaching staff.
-        </p>
+        {profile.bio ? (
+          profile.bio.split("\n\n").map((paragraph, idx) => (
+            <p
+              key={idx}
+              className={`text-sm leading-relaxed font-normal ${
+                isDark ? "text-zinc-300" : "text-zinc-700"
+              }`}
+            >
+              {paragraph}
+            </p>
+          ))
+        ) : (
+          <>
+            <p
+              className={`text-sm leading-relaxed font-normal ${
+                isDark ? "text-zinc-300" : "text-zinc-700"
+              }`}
+            >
+              Hey there! 👋 I&apos;m Dimas, a Fullstack Developer and Information Systems graduate
+              from Universitas Brawijaya (GPA 3.60). I specialize in engineering high-performance
+              web applications, robust backend microservices, and reactive user interfaces.
+            </p>
+            <p
+              className={`text-sm leading-relaxed font-normal ${
+                isDark ? "text-zinc-300" : "text-zinc-700"
+              }`}
+            >
+              Most notably, I architected and engineered the{" "}
+              <strong
+                className={`font-semibold ${
+                  isDark ? "text-white" : "text-zinc-950"
+                }`}
+              >
+                Integrated Soccer Monitoring System (ISMS) for Persebaya Surabaya
+              </strong>
+              , a data analytics platform calculating athlete ACWR physical loads, GPS metrics, and
+              medical diagnostics to empower data-driven tactical decisions for elite coaching staff.
+            </p>
+          </>
+        )}
       </div>
 
       {/* 3. Section: Background & Philosophy */}

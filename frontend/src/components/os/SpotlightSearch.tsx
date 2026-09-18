@@ -17,6 +17,8 @@ import {
   Sparkles,
   ArrowRight,
   CornerDownLeft,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 type SearchItem = {
@@ -36,6 +38,8 @@ export default function SpotlightSearch() {
     setAdminPortalOpen,
     theme,
     toggleTheme,
+    isFullscreen,
+    toggleFullscreen,
   } = useDesktop();
 
   const [query, setQuery] = useState("");
@@ -207,6 +211,17 @@ export default function SpotlightSearch() {
       action: () => toggleTheme(),
     },
     {
+      id: "act-fullscreen",
+      title: isFullscreen ? "Exit Fullscreen Mode" : "Enter Fullscreen Mode",
+      subtitle: "Toggle borderless immersive OS desktop canvas (⌃⌘F / F11)",
+      category: "Quick Actions",
+      icon: isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />,
+      action: () => {
+        toggleFullscreen();
+        setSpotlightOpen(false);
+      },
+    },
+    {
       id: "act-contact",
       title: "Send Direct Message to Dimas",
       subtitle: "Dispatches directly to Go Gin backend endpoint",
@@ -225,7 +240,7 @@ export default function SpotlightSearch() {
         setSpotlightOpen(false);
       },
     },
-  ], [isDark, openWindow, toggleTheme]);
+  ], [isDark, isFullscreen, openWindow, setAdminPortalOpen, setSpotlightOpen, toggleFullscreen, toggleTheme]);
 
   const filteredItems = useMemo(() => {
     if (!query.trim()) return allItems;

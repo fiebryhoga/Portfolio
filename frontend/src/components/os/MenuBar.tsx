@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, LayoutTemplate, Sun, Moon, FileDown } from "lucide-react";
+import { Search, LayoutTemplate, Sun, Moon, FileDown, Maximize2, Minimize2 } from "lucide-react";
 import { useDesktop, STAGE_APPS } from "@/context/DesktopContext";
 
 export default function MenuBar() {
@@ -24,6 +24,8 @@ export default function MenuBar() {
     setTheme,
     setSpotlightOpen,
     setAdminPortalOpen,
+    isFullscreen,
+    toggleFullscreen,
   } = useDesktop();
 
   useEffect(() => {
@@ -397,6 +399,20 @@ export default function MenuBar() {
                 >
                   <span>{isMaximized ? "Restore Window Size" : "Maximize Window"}</span>
                 </button>
+                <div className={separatorClass} />
+                <button
+                  onClick={() => {
+                    toggleFullscreen();
+                    closeMenus();
+                  }}
+                  className={menuItemClass}
+                >
+                  <span className="flex items-center gap-2">
+                    {isFullscreen ? <span>✓</span> : <span className="w-2.5" />}
+                    {isFullscreen ? "Exit Full Screen" : "Enter Full Screen"}
+                  </span>
+                  <span className="opacity-50 font-mono text-[10px]">⌃⌘F</span>
+                </button>
               </div>
             )}
           </div>
@@ -438,6 +454,16 @@ export default function MenuBar() {
                   className={menuItemClass}
                 >
                   <span>Zoom / Maximize</span>
+                </button>
+                <button
+                  onClick={() => {
+                    toggleFullscreen();
+                    closeMenus();
+                  }}
+                  className={menuItemClass}
+                >
+                  <span>{isFullscreen ? "Exit Full Screen" : "Toggle Full Screen"}</span>
+                  <span className="opacity-50 font-mono text-[10px]">⌃⌘F</span>
                 </button>
                 <div className={separatorClass} />
                 <div className="px-3 py-1 text-[10px] font-semibold opacity-40 uppercase tracking-wider">
@@ -574,6 +600,24 @@ export default function MenuBar() {
           aria-label="Toggle theme"
         >
           {isDark ? <Sun size={13} /> : <Moon size={13} />}
+        </button>
+
+        {/* Fullscreen Toggle Button */}
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? "Exit Full Screen (⌃⌘F / F11)" : "Enter Full Screen (⌃⌘F / F11)"}
+          className={`p-1.5 rounded-md transition-all cursor-pointer ${
+            isFullscreen
+              ? isDark
+                ? "text-white bg-white/15"
+                : "text-black bg-black/10 font-bold"
+              : isDark
+              ? "hover:bg-white/15 text-zinc-300 hover:text-white"
+              : "hover:bg-black/10 text-zinc-700 hover:text-black"
+          }`}
+          aria-label={isFullscreen ? "Exit Full Screen" : "Enter Full Screen"}
+        >
+          {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
         </button>
 
         {/* Stage Manager Toggle Icon */}

@@ -43,6 +43,13 @@ export default function Home() {
       }
     }
     loadData();
+
+    // Listen to real-time update events from Admin Portal
+    const handleUpdate = () => {
+      loadData();
+    };
+    window.addEventListener("portfolio-content-updated", handleUpdate);
+    return () => window.removeEventListener("portfolio-content-updated", handleUpdate);
   }, []);
 
   return (
