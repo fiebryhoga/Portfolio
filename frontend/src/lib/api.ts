@@ -780,9 +780,13 @@ export async function uploadAdminFile(
     throw new Error(err.error || err.message || "Failed to upload file");
   }
 
-  const json: APIResponse<{ url: string; filename: string; size: number }> =
-    await res.json();
-  return json.data;
+  const json = await res.json();
+  const data = json.data || json;
+  return {
+    url: data.url,
+    filename: data.filename || "",
+    size: data.size || 0,
+  };
 }
 
 

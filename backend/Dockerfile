@@ -1,33 +1,34 @@
-# Build stage
-FROM golang:1.27-alpine AS builder
+# Dockerfile for Laravel 12 Backend (PHP 8.4)
+FROM php:8.4-cli-alpine
 
-WORKDIR /app
+# Install system dependencies and PHP extensions for MySQL & Composer
+RUN apk add --no-cache \
+    git \
+    curl \
+    libpng-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    mysql-client \
+    oniguruma-dev \
+    linux-headers \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd pcntl
 
-# Install git and ca-certificates
-RUN apk add --no-cache git ca-certificates tzdata
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Cache go modules
-COPY go.mod go.sum ./
-RUN go mod download
+WORKDIR /var/www
 
-# Copy source
+# Copy application files
 COPY . .
 
-# Build statically linked binary
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/server cmd/main.go
+# Install production dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Production stage
-FROM alpine:3.19
+# Create necessary directories and set permissions
+RUN mkdir -p storage bootstrap/cache public/uploads \
+    && chmod -R 775 storage bootstrap/cache public/uploads
 
-WORKDIR /app
-
-RUN apk --no-cache add ca-certificates tzdata
-
-# Copy binary from builder
-COPY --from=builder /app/server /app/server
-
-# Expose Go Gin port
 EXPOSE 8080
 
-# Run server
-ENTRYPOINT ["/app/server"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]

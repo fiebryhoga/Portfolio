@@ -35,7 +35,6 @@ export default function SpotlightSearch() {
     spotlightOpen,
     setSpotlightOpen,
     openWindow,
-    setAdminPortalOpen,
     theme,
     toggleTheme,
     isFullscreen,
@@ -105,17 +104,6 @@ export default function SpotlightSearch() {
       category: "Applications",
       icon: <Terminal className="w-4 h-4" />,
       action: () => openWindow("contact"),
-    },
-    {
-      id: "app-admin",
-      title: "Admin Portal & Content Manager",
-      subtitle: "Manage Profile, Projects, Skills, Articles, Experience & Messages",
-      category: "Applications",
-      icon: <Settings className="w-4 h-4" />,
-      action: () => {
-        setAdminPortalOpen(true);
-        setSpotlightOpen(false);
-      },
     },
 
     // Projects
@@ -229,18 +217,7 @@ export default function SpotlightSearch() {
       icon: <ArrowRight className="w-4 h-4" />,
       action: () => openWindow("contact"),
     },
-    {
-      id: "act-admin",
-      title: "Open Admin Portal (Cmd+Shift+A)",
-      subtitle: "Authenticated CMS to add, edit, or delete any website content",
-      category: "Quick Actions",
-      icon: <Settings className="w-4 h-4" />,
-      action: () => {
-        setAdminPortalOpen(true);
-        setSpotlightOpen(false);
-      },
-    },
-  ], [isDark, isFullscreen, openWindow, setAdminPortalOpen, setSpotlightOpen, toggleFullscreen, toggleTheme]);
+  ], [isDark, isFullscreen, openWindow, setSpotlightOpen, toggleFullscreen, toggleTheme]);
 
   const filteredItems = useMemo(() => {
     if (!query.trim()) return allItems;

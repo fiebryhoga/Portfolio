@@ -158,16 +158,6 @@ export default function MenuBar() {
                 >
                   <span>System Preferences / Tech Stack</span>
                 </button>
-                <button
-                  onClick={() => {
-                    setAdminPortalOpen(true);
-                    closeMenus();
-                  }}
-                  className={menuItemClass}
-                >
-                  <span className="font-semibold">Admin Portal & Content Manager...</span>
-                  <span className="opacity-60 font-mono text-[10px]">⌘⇧A</span>
-                </button>
                 <div className={separatorClass} />
                 <a
                   href="https://github.com/fiebryhoga"

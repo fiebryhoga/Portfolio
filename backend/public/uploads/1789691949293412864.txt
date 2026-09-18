@@ -1,0 +1,53 @@
+DIMAS FIEBRY PRAYHOGA PUTRA
++6285730979537 | dimasfiebry@gmail.com | linkedin.com/in/dimas-fiebry-prayhoga-putra/ | https://fiebryhoga.my.id/
+Malang, Indonesia
+
+PROFESSIONAL SUMMARY
+Versatile Fullstack Developer with a strong track record of architecting and deploying scalable web applications, ranging from enterprise-level sports analytics platforms to comprehensive business management solutions. Combining a solid academic foundation from Universitas Brawijaya with extensive hands-on experience in API integrations, database architecture, and end-to-end project management. Eager to bring technical adaptability and a problem-solving mindset to a dynamic engineering team.
+
+WORK EXPERIENCES
+
+PT. Suyoko Fit Sejahtera - Persebaya Surabaya (ISMS)
+Fullstack Developer - Ass. Performance Analyst | February 2026 - August 2026 | Surabaya, Indonesia
+- Developed the Integrated Soccer Monitoring System (ISMS), an elite performance analysis platform exclusively for Persebaya Surabaya, generating comprehensive data-driven reports directly for the Head Coach.
+- Leveraged Laravel 11, Filament 3, Livewire 3, Tailwind CSS, and Alpine.js to build high-performance coach dashboards, training load metrics, and athlete management portals.
+- Implemented real-time biometric and performance analysis with Acute:Chronic Workload Ratio (ACWR via EWMA), Session-RPE, Acute Wellness Score (AWS), and Post-Performance Recovery Index (PPRI).
+- Engineered microservices and automated notification engines with Go (Gin), WhatsApp integration (Node.js & Baileys), and Python (Pandas/Scikit-Learn).
+
+PT. Barata Indonesia (Persero)
+IT Helpdesk & System Support | July 2025 - August 2025 | Gresik, Indonesia
+- Maintained enterprise ERP and corporate IT infrastructure across heavy manufacturing operations.
+- Resolved database queries, internal network configurations, and active user directory permissions.
+
+Universitas Brawijaya
+Laboratory Assistant - User Interface Programming | February 2025 - June 2025 | Malang, Indonesia
+- Mentored 80+ undergraduate engineering students in UI/UX architectures, React, TypeScript, and modern component systems.
+
+SMAN 1 Malang
+Informatics Instructor | September 2024 - November 2024 | Malang, Indonesia
+- Designed curriculum and taught fundamental algorithmic problem-solving and web technologies to high school students.
+
+KEY PROJECTS
+1. ISMS - Integrated Soccer Monitoring System (Persebaya Surabaya)
+   Stack: Laravel 11, Filament 3, Go (Gin), Livewire 3, PostgreSQL, Docker, Python
+2. E-Learning SMAN 1 Gondang Tulungagung
+   Stack: Next.js 15, React 19, TypeScript, Tailwind CSS, PostgreSQL, REST APIs
+3. Modern POS & Inventory Management System
+   Stack: Go (Gin), Next.js, PostgreSQL, Redis, Docker
+4. WhatsApp Automated Dispatch Microservice
+   Stack: Node.js, Baileys, Go Gin webhook relay
+
+EDUCATION
+Universitas Brawijaya | Malang, Indonesia
+Bachelor of Information Systems | Aug 2022 - Aug 2026 | GPA: 3.60 / 4.00
+
+MA Matholi'ul Anwar | Lamongan, Indonesia
+Natural Sciences & IT | July 2019 - June 2022
+- Ranked 1st Place - Most Outstanding Student
+- 3rd Place - National Science Olympiad (OSN) Informatics
+
+TECHNICAL PROFICIENCIES
+- Languages: Go (Golang), TypeScript, JavaScript, PHP, Python, SQL, HTML5/CSS3
+- Backend: Gin Gonic, Laravel, Node.js, RESTful APIs, Concurrency, Microservices, JWT
+- Frontend: React 19, Next.js 15, Inertia.js, Livewire, Tailwind CSS, Alpine.js
+- Database & DevOps: PostgreSQL, MySQL, Redis, Docker, Git, CI/CD, Linux / Bash

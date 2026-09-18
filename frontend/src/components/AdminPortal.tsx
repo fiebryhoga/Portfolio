@@ -210,12 +210,12 @@ export default function AdminPortal() {
       } catch {
         // ignore
       }
-      notify("success", "Successfully authenticated with Go Gin API & PostgreSQL!");
+      notify("success", "Successfully authenticated with Laravel 12 API & MySQL!");
     } catch (err: unknown) {
       setAuthError(
         err instanceof Error
           ? err.message
-          : "Authentication failed. Check Go Gin API connection."
+          : "Authentication failed. Check Laravel API connection."
       );
     } finally {
       setAuthLoading(false);
@@ -231,7 +231,7 @@ export default function AdminPortal() {
       const updated = await updateAdminProfile(token, profileForm);
       setProfile(updated);
       setProfileForm(updated);
-      notify("success", "Profil berhasil disimpan ke PostgreSQL Database!");
+      notify("success", "Profil berhasil disimpan ke MySQL Database!");
       try {
         window.dispatchEvent(new CustomEvent("portfolio-content-updated"));
       } catch {}
@@ -256,7 +256,7 @@ export default function AdminPortal() {
       // Auto-save immediately to database
       const updated = await updateAdminProfile(token, newForm);
       setProfile(updated);
-      notify("success", "Foto profil berhasil diupload dan disimpan ke PostgreSQL!");
+      notify("success", "Foto profil berhasil diupload dan disimpan ke MySQL!");
       try {
         window.dispatchEvent(new CustomEvent("portfolio-content-updated"));
       } catch {}
@@ -607,7 +607,7 @@ export default function AdminPortal() {
             </div>
             <h2 className="text-xl font-bold mb-1">Portfolio CMS Login</h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm">
-              Authenticate against the Go Gin REST API to edit Profile, Projects,
+              Authenticate against the Laravel 12 REST API & MySQL to edit Profile, Projects,
               Experience, Skills, and Articles in real time.
             </p>
 
@@ -901,36 +901,11 @@ export default function AdminPortal() {
                           type="button"
                           onClick={() => avatarInputRef.current?.click()}
                           disabled={uploadingAvatar}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-opacity flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                          className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 transition-opacity flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
                         >
-                          <UploadCloud className="w-3.5 h-3.5" />
-                          <span>{uploadingAvatar ? "Mengunggah..." : "Upload Foto Profil"}</span>
+                          <UploadCloud className="w-4 h-4" />
+                          <span>{uploadingAvatar ? "Mengunggah..." : "Upload Foto dari Perangkat"}</span>
                         </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const defaultUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80";
-                            setProfileForm({ ...profileForm, avatar_url: defaultUrl });
-                          }}
-                          className="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                        >
-                          Reset ke Default
-                        </button>
-                      </div>
-
-                      {/* URL input field */}
-                      <div className="mt-2.5 flex items-center gap-2">
-                        <span className="text-[10px] font-mono text-zinc-400 shrink-0">Atau URL:</span>
-                        <input
-                          type="text"
-                          value={profileForm.avatar_url || ""}
-                          onChange={(e) =>
-                            setProfileForm({ ...profileForm, avatar_url: e.target.value })
-                          }
-                          placeholder="https://..."
-                          className="w-full px-2 py-1 rounded-md text-[11px] font-mono border bg-transparent border-black/15 dark:border-white/15 focus:outline-hidden"
-                        />
                       </div>
                     </div>
                   </div>
@@ -1187,19 +1162,7 @@ export default function AdminPortal() {
                         {/* Project Image & Upload */}
                         <div>
                           <label className="font-semibold block mb-1">Project Screenshot / Cover Image</label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={editingProject.image_url || ""}
-                              onChange={(e) =>
-                                setEditingProject({
-                                  ...editingProject,
-                                  image_url: e.target.value,
-                                })
-                              }
-                              placeholder="https://... or upload below"
-                              className="flex-1 px-2.5 py-1.5 rounded-lg border bg-transparent border-black/15 dark:border-white/15 focus:outline-hidden font-mono text-[11px]"
-                            />
+                          <div className="flex items-center gap-3">
                             <input
                               type="file"
                               ref={projectImgInputRef}
@@ -1211,14 +1174,19 @@ export default function AdminPortal() {
                               type="button"
                               onClick={() => projectImgInputRef.current?.click()}
                               disabled={uploadingProjectImg}
-                              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 flex items-center gap-1 shrink-0"
+                              className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 flex items-center gap-1.5 shrink-0 cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50"
                             >
-                              <UploadCloud className="w-3.5 h-3.5" />
-                              <span>{uploadingProjectImg ? "Uploading..." : "Upload Image"}</span>
+                              <UploadCloud className="w-4 h-4" />
+                              <span>{uploadingProjectImg ? "Mengunggah..." : "Upload Gambar dari Perangkat"}</span>
                             </button>
+                            {editingProject.image_url && (
+                              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                                <Check className="w-3.5 h-3.5" /> Gambar terpasang
+                              </span>
+                            )}
                           </div>
                           {editingProject.image_url && (
-                            <div className="mt-2 w-32 h-20 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5">
+                            <div className="mt-2.5 w-40 h-24 rounded-lg overflow-hidden border border-black/10 dark:border-white/15 bg-black/5">
                               <img
                                 src={editingProject.image_url}
                                 alt="Preview"
